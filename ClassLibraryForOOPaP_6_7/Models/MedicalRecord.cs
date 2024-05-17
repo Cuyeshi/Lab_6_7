@@ -13,5 +13,8 @@ namespace ClassLibraryForOOPaP_6_7
         public int PatientID { get; set; }
         public string Diagnosis { get; set; }
         public DateTime ExaminationDate { get; set; }
+                
+        public string DoctorName { get; set; }
+        public string PatientName { get; set; }
     }
 }

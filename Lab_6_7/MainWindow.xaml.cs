@@ -49,13 +49,31 @@ namespace Lab_6_7
 
         private void LoadData_Click(object sender, RoutedEventArgs e)
         {
-            var medicalRecords = _medicalRecordRepository.GetAll("SELECT * FROM MedicalRecords", reader =>
+            var query = @"
+                SELECT 
+                    m.RecordID, 
+                    m.DoctorID, 
+                    d.FullName AS DoctorName, 
+                    m.PatientID, 
+                    p.FullName AS PatientName, 
+                    m.Diagnosis, 
+                    m.ExaminationDate
+                FROM 
+                    MedicalRecords m
+                JOIN 
+                    Doctors d ON m.DoctorID = d.DoctorID
+                JOIN 
+                    Patients p ON m.PatientID = p.PatientID";
+
+            var medicalRecords = _medicalRecordRepository.GetAll(query, reader =>
             {
                 return new MedicalRecord
                 {
                     RecordID = (int)reader["RecordID"],
                     DoctorID = (int)reader["DoctorID"],
+                    DoctorName = reader["DoctorName"].ToString(),
                     PatientID = (int)reader["PatientID"],
+                    PatientName = reader["PatientName"].ToString(),
                     Diagnosis = reader["Diagnosis"].ToString(),
                     ExaminationDate = (DateTime)reader["ExaminationDate"]
                 };
@@ -66,15 +84,27 @@ namespace Lab_6_7
 
         private void Create_Click(object sender, RoutedEventArgs e)
         {
+            var doctor = DoctorsComboBox.SelectedItem as Doctor;
+            var patient = PatientsComboBox.SelectedItem as Patient;
+
+            if (doctor == null || patient == null)
+            {
+                MessageBox.Show("Please select both a doctor and a patient.");
+                return;
+            }
+
             var newRecord = new MedicalRecord
             {
-                DoctorID = (int)DoctorsComboBox.SelectedValue,
-                PatientID = (int)PatientsComboBox.SelectedValue,
+                DoctorID = doctor.DoctorID,
+                PatientID = patient.PatientID,
+                DoctorName = doctor.FullName,
+                PatientName = patient.FullName,
                 Diagnosis = "New Diagnosis",
                 ExaminationDate = DateTime.Now
             };
 
-            _medicalRecordRepository.Create("INSERT INTO MedicalRecords (DoctorID, PatientID, Diagnosis, ExaminationDate) VALUES (@DoctorID, @PatientID, @Diagnosis, @ExaminationDate)", cmd =>
+            _medicalRecordRepository.Create("INSERT INTO MedicalRecords (DoctorID, PatientID, " +
+                "Diagnosis, ExaminationDate) VALUES (@DoctorID, @PatientID, @Diagnosis, @ExaminationDate)", cmd =>
             {
                 cmd.Parameters.AddWithValue("@DoctorID", newRecord.DoctorID);
                 cmd.Parameters.AddWithValue("@PatientID", newRecord.PatientID);
@@ -89,12 +119,24 @@ namespace Lab_6_7
         {
             if (MedicalRecordsDataGrid.SelectedItem is MedicalRecord selectedRecord)
             {
-                selectedRecord.DoctorID = (int)DoctorsComboBox.SelectedValue;
-                selectedRecord.PatientID = (int)PatientsComboBox.SelectedValue;
+                var doctor = DoctorsComboBox.SelectedItem as Doctor;
+                var patient = PatientsComboBox.SelectedItem as Patient;
+
+                if (doctor == null || patient == null)
+                {
+                    MessageBox.Show("Please select both a doctor and a patient.");
+                    return;
+                }
+
+                selectedRecord.DoctorID = doctor.DoctorID;
+                selectedRecord.PatientID = patient.PatientID;
+                selectedRecord.DoctorName = doctor.FullName;
+                selectedRecord.PatientName = patient.FullName;
                 selectedRecord.Diagnosis = "Updated Diagnosis";
                 selectedRecord.ExaminationDate = DateTime.Now;
 
-                _medicalRecordRepository.Update("UPDATE MedicalRecords SET DoctorID = @DoctorID, PatientID = @PatientID, Diagnosis = @Diagnosis, ExaminationDate = @ExaminationDate WHERE RecordID = @RecordID", cmd =>
+                _medicalRecordRepository.Update("UPDATE MedicalRecords SET DoctorID = @DoctorID, " +
+                    "PatientID = @PatientID, Diagnosis = @Diagnosis, ExaminationDate = @ExaminationDate WHERE RecordID = @RecordID", cmd =>
                 {
                     cmd.Parameters.AddWithValue("@DoctorID", selectedRecord.DoctorID);
                     cmd.Parameters.AddWithValue("@PatientID", selectedRecord.PatientID);

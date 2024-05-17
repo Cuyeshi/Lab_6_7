@@ -16,8 +16,8 @@
         <DataGrid x:Name="MedicalRecordsDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5" SelectionMode="Single">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Record ID" Binding="{Binding RecordID}" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Doctor ID" Binding="{Binding DoctorID}"/>
-                <DataGridTextColumn Header="Patient ID" Binding="{Binding PatientID}"/>
+                <DataGridTextColumn Header="Doctor" Binding="{Binding DoctorName}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Patient" Binding="{Binding PatientName}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Diagnosis" Binding="{Binding Diagnosis}"/>
                 <DataGridTextColumn Header="Examination Date" Binding="{Binding ExaminationDate}"/>
             </DataGrid.Columns>
