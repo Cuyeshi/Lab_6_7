@@ -12,7 +12,7 @@ namespace ClassLibraryForOOPaP_6_7
 
         public Repository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["MedicalRecordsDB"].ConnectionString;
+            _connectionString = ConfigurationManager.ConnectionStrings["OOPaP_67"].ConnectionString;
         }
 
         public List<T> GetAll(string query, Func<IDataReader, T> readRecord)

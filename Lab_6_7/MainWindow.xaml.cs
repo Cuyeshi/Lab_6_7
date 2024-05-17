@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Linq;
+using ClassLibraryForOOPaP_6_7;
 
 namespace Lab_6_7
 {
@@ -71,6 +62,62 @@ namespace Lab_6_7
             });
 
             MedicalRecordsDataGrid.ItemsSource = medicalRecords;
+        }
+
+        private void Create_Click(object sender, RoutedEventArgs e)
+        {
+            var newRecord = new MedicalRecord
+            {
+                DoctorID = (int)DoctorsComboBox.SelectedValue,
+                PatientID = (int)PatientsComboBox.SelectedValue,
+                Diagnosis = "New Diagnosis",
+                ExaminationDate = DateTime.Now
+            };
+
+            _medicalRecordRepository.Create("INSERT INTO MedicalRecords (DoctorID, PatientID, Diagnosis, ExaminationDate) VALUES (@DoctorID, @PatientID, @Diagnosis, @ExaminationDate)", cmd =>
+            {
+                cmd.Parameters.AddWithValue("@DoctorID", newRecord.DoctorID);
+                cmd.Parameters.AddWithValue("@PatientID", newRecord.PatientID);
+                cmd.Parameters.AddWithValue("@Diagnosis", newRecord.Diagnosis);
+                cmd.Parameters.AddWithValue("@ExaminationDate", newRecord.ExaminationDate);
+            });
+
+            LoadData_Click(sender, e);
+        }
+
+        private void Update_Click(object sender, RoutedEventArgs e)
+        {
+            if (MedicalRecordsDataGrid.SelectedItem is MedicalRecord selectedRecord)
+            {
+                selectedRecord.DoctorID = (int)DoctorsComboBox.SelectedValue;
+                selectedRecord.PatientID = (int)PatientsComboBox.SelectedValue;
+                selectedRecord.Diagnosis = "Updated Diagnosis";
+                selectedRecord.ExaminationDate = DateTime.Now;
+
+                _medicalRecordRepository.Update("UPDATE MedicalRecords SET DoctorID = @DoctorID, PatientID = @PatientID, Diagnosis = @Diagnosis, ExaminationDate = @ExaminationDate WHERE RecordID = @RecordID", cmd =>
+                {
+                    cmd.Parameters.AddWithValue("@DoctorID", selectedRecord.DoctorID);
+                    cmd.Parameters.AddWithValue("@PatientID", selectedRecord.PatientID);
+                    cmd.Parameters.AddWithValue("@Diagnosis", selectedRecord.Diagnosis);
+                    cmd.Parameters.AddWithValue("@ExaminationDate", selectedRecord.ExaminationDate);
+                    cmd.Parameters.AddWithValue("@RecordID", selectedRecord.RecordID);
+                });
+
+                LoadData_Click(sender, e);
+            }
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (MedicalRecordsDataGrid.SelectedItem is MedicalRecord selectedRecord)
+            {
+                _medicalRecordRepository.Delete("DELETE FROM MedicalRecords WHERE RecordID = @RecordID", cmd =>
+                {
+                    cmd.Parameters.AddWithValue("@RecordID", selectedRecord.RecordID);
+                });
+
+                LoadData_Click(sender, e);
+            }
         }
     }
 }
