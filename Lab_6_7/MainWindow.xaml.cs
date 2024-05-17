@@ -34,7 +34,11 @@ namespace Lab_6_7
                 return new Patient
                 {
                     PatientID = (int)reader["PatientID"],
-                    FullName = reader["FullName"].ToString()
+                    FullName = reader["FullName"].ToString(),
+                    BirthYear = (int)reader["BirthYear"],
+                    Height = (decimal)reader["Height"],
+                    Weight = (decimal)reader["Weight"],
+                    BloodPressure = reader["BloodPressure"].ToString()
                 };
             });
 
@@ -50,30 +54,36 @@ namespace Lab_6_7
         private void LoadData_Click(object sender, RoutedEventArgs e)
         {
             var query = @"
-                SELECT 
-                    m.RecordID, 
-                    m.DoctorID, 
-                    d.FullName AS DoctorName, 
-                    m.PatientID, 
-                    p.FullName AS PatientName, 
-                    m.Diagnosis, 
-                    m.ExaminationDate
-                FROM 
-                    MedicalRecords m
-                JOIN 
-                    Doctors d ON m.DoctorID = d.DoctorID
-                JOIN 
-                    Patients p ON m.PatientID = p.PatientID";
+            SELECT 
+                m.DoctorID, 
+                d.FullName AS DoctorName, 
+                m.PatientID, 
+                p.FullName AS PatientName, 
+                p.BirthYear, 
+                p.Height, 
+                p.Weight, 
+                p.BloodPressure, 
+                m.Diagnosis, 
+                m.ExaminationDate
+            FROM 
+                MedicalRecords m
+            JOIN 
+                Doctors d ON m.DoctorID = d.DoctorID
+            JOIN 
+                Patients p ON m.PatientID = p.PatientID";
 
             var medicalRecords = _medicalRecordRepository.GetAll(query, reader =>
             {
                 return new MedicalRecord
                 {
-                    RecordID = (int)reader["RecordID"],
                     DoctorID = (int)reader["DoctorID"],
                     DoctorName = reader["DoctorName"].ToString(),
                     PatientID = (int)reader["PatientID"],
                     PatientName = reader["PatientName"].ToString(),
+                    BirthYear = (int)reader["BirthYear"],
+                    Height = (decimal)reader["Height"],
+                    Weight = (decimal)reader["Weight"],
+                    BloodPressure = reader["BloodPressure"].ToString(),
                     Diagnosis = reader["Diagnosis"].ToString(),
                     ExaminationDate = (DateTime)reader["ExaminationDate"]
                 };
@@ -81,6 +91,7 @@ namespace Lab_6_7
 
             MedicalRecordsDataGrid.ItemsSource = medicalRecords;
         }
+
 
         private void Create_Click(object sender, RoutedEventArgs e)
         {
@@ -103,8 +114,7 @@ namespace Lab_6_7
                 ExaminationDate = DateTime.Now
             };
 
-            _medicalRecordRepository.Create("INSERT INTO MedicalRecords (DoctorID, PatientID, " +
-                "Diagnosis, ExaminationDate) VALUES (@DoctorID, @PatientID, @Diagnosis, @ExaminationDate)", cmd =>
+            _medicalRecordRepository.Create("INSERT INTO MedicalRecords (DoctorID, PatientID, Diagnosis, ExaminationDate) VALUES (@DoctorID, @PatientID, @Diagnosis, @ExaminationDate)", cmd =>
             {
                 cmd.Parameters.AddWithValue("@DoctorID", newRecord.DoctorID);
                 cmd.Parameters.AddWithValue("@PatientID", newRecord.PatientID);
@@ -135,14 +145,12 @@ namespace Lab_6_7
                 selectedRecord.Diagnosis = "Updated Diagnosis";
                 selectedRecord.ExaminationDate = DateTime.Now;
 
-                _medicalRecordRepository.Update("UPDATE MedicalRecords SET DoctorID = @DoctorID, " +
-                    "PatientID = @PatientID, Diagnosis = @Diagnosis, ExaminationDate = @ExaminationDate WHERE RecordID = @RecordID", cmd =>
+                _medicalRecordRepository.Update("UPDATE MedicalRecords SET DoctorID = @DoctorID, PatientID = @PatientID, Diagnosis = @Diagnosis, ExaminationDate = @ExaminationDate WHERE DoctorID = @DoctorID AND PatientID = @PatientID", cmd =>
                 {
                     cmd.Parameters.AddWithValue("@DoctorID", selectedRecord.DoctorID);
                     cmd.Parameters.AddWithValue("@PatientID", selectedRecord.PatientID);
                     cmd.Parameters.AddWithValue("@Diagnosis", selectedRecord.Diagnosis);
                     cmd.Parameters.AddWithValue("@ExaminationDate", selectedRecord.ExaminationDate);
-                    cmd.Parameters.AddWithValue("@RecordID", selectedRecord.RecordID);
                 });
 
                 LoadData_Click(sender, e);
@@ -153,9 +161,10 @@ namespace Lab_6_7
         {
             if (MedicalRecordsDataGrid.SelectedItem is MedicalRecord selectedRecord)
             {
-                _medicalRecordRepository.Delete("DELETE FROM MedicalRecords WHERE RecordID = @RecordID", cmd =>
+                _medicalRecordRepository.Delete("DELETE FROM MedicalRecords WHERE DoctorID = @DoctorID AND PatientID = @PatientID", cmd =>
                 {
-                    cmd.Parameters.AddWithValue("@RecordID", selectedRecord.RecordID);
+                    cmd.Parameters.AddWithValue("@DoctorID", selectedRecord.DoctorID);
+                    cmd.Parameters.AddWithValue("@PatientID", selectedRecord.PatientID);
                 });
 
                 LoadData_Click(sender, e);

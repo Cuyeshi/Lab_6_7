@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace ClassLibraryForOOPaP_6_7
 {
-    public class MedicalRecord
+    public class MedicalRecord : Patient
     {
-        public int RecordID { get; set; }
         public int DoctorID { get; set; }
         public int PatientID { get; set; }
         public string Diagnosis { get; set; }

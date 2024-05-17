@@ -11,21 +11,26 @@
         <StackPanel Orientation="Horizontal" Grid.Row="0">
             <ComboBox x:Name="DoctorsComboBox" Width="200" Margin="5"/>
             <ComboBox x:Name="PatientsComboBox" Width="200" Margin="5"/>
-            <Button Content="Load Data" Click="LoadData_Click" Width="100" Margin="5"/>
+            <ComboBox x:Name="DiagnosisComboBox" Width="200" Margin="5"/>
+            <Button Content="Загрузить данные" Click="LoadData_Click" Width="100" Margin="5"/>
         </StackPanel>
         <DataGrid x:Name="MedicalRecordsDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5" SelectionMode="Single">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Record ID" Binding="{Binding RecordID}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Doctor" Binding="{Binding DoctorName}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Patient" Binding="{Binding PatientName}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Diagnosis" Binding="{Binding Diagnosis}"/>
                 <DataGridTextColumn Header="Examination Date" Binding="{Binding ExaminationDate}"/>
+                <DataGridTextColumn Header="BirthYear" Binding="{Binding BirthYear}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Height" Binding="{Binding Height}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Weight" Binding="{Binding Weight}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Blood Pressure" Binding="{Binding BloodPressure}" IsReadOnly="True"/>
             </DataGrid.Columns>
+
         </DataGrid>
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center" Margin="10">
-            <Button Content="Create" Click="Create_Click" Width="100" Margin="5"/>
-            <Button Content="Update" Click="Update_Click" Width="100" Margin="5"/>
-            <Button Content="Delete" Click="Delete_Click" Width="100" Margin="5"/>
+            <Button Content="Добавить запись" Click="Create_Click" Width="100" Margin="5"/>
+            <Button Content="Обновить запись" Click="Update_Click" Width="100" Margin="5"/>
+            <Button Content="Удалить запись" Click="Delete_Click" Width="100" Margin="5"/>
         </StackPanel>
     </Grid>
 </Window>
