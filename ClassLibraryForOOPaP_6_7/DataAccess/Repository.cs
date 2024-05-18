@@ -36,6 +36,26 @@ namespace ClassLibraryForOOPaP_6_7
             return records;
         }
 
+        public List<string> GetDiagnoses(string query)
+        {
+            List<string> diagnoses = new List<string>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        diagnoses.Add(reader["Diagnosis"].ToString());
+                    }
+                }
+            }
+
+            return diagnoses;
+        }
+
         public void ExecuteNonQuery(string query, Action<SqlCommand> parameterize)
         {
             using (var connection = new SqlConnection(_connectionString))
