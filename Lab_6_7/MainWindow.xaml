@@ -34,7 +34,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Diagnosis:" Width="100"/>
-                <ComboBox x:Name="DiagnosesComboBox" Width="200"/>
+                <ComboBox x:Name="DiagnosisComboBox" Width="200"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                 <Button Content="Load Data" Click="LoadData_Click" Width="100" Margin="5"/>

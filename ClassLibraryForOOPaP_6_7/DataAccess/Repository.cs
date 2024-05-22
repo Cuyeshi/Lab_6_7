@@ -67,19 +67,16 @@ namespace ClassLibraryForOOPaP_6_7
             }
         }
 
-        // Create
         public void Create(string query, Action<SqlCommand> parameterize)
         {
             ExecuteNonQuery(query, parameterize);
         }
 
-        // Update
         public void Update(string query, Action<SqlCommand> parameterize)
         {
             ExecuteNonQuery(query, parameterize);
         }
 
-        // Delete
         public void Delete(string query, Action<SqlCommand> parameterize)
         {
             ExecuteNonQuery(query, parameterize);

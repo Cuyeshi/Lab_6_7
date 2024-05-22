@@ -8,7 +8,6 @@ namespace Lab_6_7
     public partial class MainWindow : Window
     {
         private readonly Repository<Doctor> _doctorRepository = new Repository<Doctor>();
-        private readonly Repository<Patient> _patientRepository = new Repository<Patient>();
         private readonly Repository<MedicalRecord> _medicalRecordRepository = new Repository<MedicalRecord>();
 
         public MainWindow()
@@ -34,7 +33,7 @@ namespace Lab_6_7
             DoctorsComboBox.DisplayMemberPath = "FullName";
             DoctorsComboBox.SelectedValuePath = "DoctorID";
 
-            DiagnosesComboBox.ItemsSource = diagnoses;
+            DiagnosisComboBox.ItemsSource = diagnoses;
         }
 
         private void LoadData_Click(object sender, RoutedEventArgs e)
@@ -84,7 +83,7 @@ namespace Lab_6_7
         private void Create_Click(object sender, RoutedEventArgs e)
         {
             var doctor = DoctorsComboBox.SelectedItem as Doctor;
-            var diagnosis = DiagnosesComboBox.SelectedItem as string;
+            var diagnosis = DiagnosisComboBox.SelectedItem as string;
 
             if (doctor == null || string.IsNullOrEmpty(diagnosis) ||
                 string.IsNullOrEmpty(PatientNameTextBox.Text) ||
@@ -155,68 +154,74 @@ namespace Lab_6_7
 
         private void Update_Click(object sender, RoutedEventArgs e)
         {
-            if (MedicalRecordsDataGrid.SelectedItem is MedicalRecord selectedRecord)
+            var selectedRecord = MedicalRecordsDataGrid.SelectedItem as MedicalRecord;
+            if (selectedRecord == null)
             {
-                var doctor = DoctorsComboBox.SelectedItem as Doctor;
-                var diagnosis = DiagnosesComboBox.SelectedItem as string;
+                MessageBox.Show("Please select a record to update.");
+                return;
+            }
 
-                if (doctor == null || string.IsNullOrEmpty(diagnosis) ||
-                    string.IsNullOrEmpty(PatientNameTextBox.Text) ||
-                    string.IsNullOrEmpty(BirthYearTextBox.Text) ||
-                    string.IsNullOrEmpty(HeightTextBox.Text) ||
-                    string.IsNullOrEmpty(WeightTextBox.Text) ||
-                    string.IsNullOrEmpty(BloodPressureTextBox.Text))
-                {
-                    MessageBox.Show("Please fill in all fields.");
-                    return;
-                }
+            var doctor = DoctorsComboBox.SelectedItem as Doctor;
+            var diagnosis = DiagnosisComboBox.SelectedItem as string;
 
-                using (var connection = new SqlConnection("Data Source=DESKTOP-2GTDQ2V\\SQLEXPRESS;Initial" +
+            if (doctor == null || string.IsNullOrEmpty(diagnosis) ||
+                string.IsNullOrEmpty(PatientNameTextBox.Text) ||
+                string.IsNullOrEmpty(BirthYearTextBox.Text) ||
+                string.IsNullOrEmpty(HeightTextBox.Text) ||
+                string.IsNullOrEmpty(WeightTextBox.Text) ||
+                string.IsNullOrEmpty(BloodPressureTextBox.Text))
+            {
+                MessageBox.Show("Please fill in all fields.");
+                return;
+            }
+
+            using (var connection = new SqlConnection("Data Source=DESKTOP-2GTDQ2V\\SQLEXPRESS;Initial" +
                     " Catalog=OOPaP_67;Integrated Security=True"))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
                 {
-                    connection.Open();
-                    using (var transaction = connection.BeginTransaction())
+                    try
                     {
-                        try
-                        {
-                            // Update patient
-                            var updatePatientCommand = new SqlCommand(
-                                "UPDATE Patients SET FullName = @FullName, BirthYear = @BirthYear, Height = @Height, " +
-                                "Weight = @Weight, BloodPressure = @BloodPressure WHERE PatientID = @PatientID", connection, transaction);
-                            updatePatientCommand.Parameters.AddWithValue("@FullName", PatientNameTextBox.Text);
-                            updatePatientCommand.Parameters.AddWithValue("@BirthYear", int.Parse(BirthYearTextBox.Text));
-                            updatePatientCommand.Parameters.AddWithValue("@Height", int.Parse(HeightTextBox.Text));
-                            updatePatientCommand.Parameters.AddWithValue("@Weight", int.Parse(WeightTextBox.Text));
-                            updatePatientCommand.Parameters.AddWithValue("@BloodPressure", BloodPressureTextBox.Text);
-                            updatePatientCommand.Parameters.AddWithValue("@PatientID", selectedRecord.PatientID);
+                        // Update patient information
+                        var updatePatientCommand = new SqlCommand(
+                            "UPDATE Patients SET FullName = @FullName, BirthYear = @BirthYear, Height = @Height, Weight = @Weight, BloodPressure = @BloodPressure " +
+                            "WHERE PatientID = @PatientID", connection, transaction);
+                        updatePatientCommand.Parameters.AddWithValue("@FullName", PatientNameTextBox.Text);
+                        updatePatientCommand.Parameters.AddWithValue("@BirthYear", int.Parse(BirthYearTextBox.Text));
+                        updatePatientCommand.Parameters.AddWithValue("@Height", int.Parse(HeightTextBox.Text));
+                        updatePatientCommand.Parameters.AddWithValue("@Weight", int.Parse(WeightTextBox.Text));
+                        updatePatientCommand.Parameters.AddWithValue("@BloodPressure", BloodPressureTextBox.Text);
+                        updatePatientCommand.Parameters.AddWithValue("@PatientID", selectedRecord.PatientID);
 
-                            updatePatientCommand.ExecuteNonQuery();
+                        updatePatientCommand.ExecuteNonQuery();
 
-                            // Update medical record
-                            var updateMedicalRecordCommand = new SqlCommand(
-                                "UPDATE MedicalRecords SET DoctorID = @DoctorID, Diagnosis = @Diagnosis, ExaminationDate = @ExaminationDate " +
-                                "WHERE DoctorID = @DoctorID AND PatientID = @PatientID", connection, transaction);
-                            updateMedicalRecordCommand.Parameters.AddWithValue("@DoctorID", doctor.DoctorID);
-                            updateMedicalRecordCommand.Parameters.AddWithValue("@PatientID", selectedRecord.PatientID);
-                            updateMedicalRecordCommand.Parameters.AddWithValue("@Diagnosis", diagnosis);
-                            updateMedicalRecordCommand.Parameters.AddWithValue("@ExaminationDate", DateTime.Now);
+                        // Update medical record information
+                        var updateMedicalRecordCommand = new SqlCommand(
+                            "UPDATE MedicalRecords SET DoctorID = @DoctorID, Diagnosis = @Diagnosis, ExaminationDate = @ExaminationDate " +
+                            "WHERE DoctorID = @OldDoctorID AND PatientID = @PatientID", connection, transaction);
+                        updateMedicalRecordCommand.Parameters.AddWithValue("@DoctorID", doctor.DoctorID);
+                        updateMedicalRecordCommand.Parameters.AddWithValue("@Diagnosis", diagnosis);
+                        updateMedicalRecordCommand.Parameters.AddWithValue("@ExaminationDate", DateTime.Now);
+                        updateMedicalRecordCommand.Parameters.AddWithValue("@OldDoctorID", selectedRecord.DoctorID);
+                        updateMedicalRecordCommand.Parameters.AddWithValue("@PatientID", selectedRecord.PatientID);
 
-                            updateMedicalRecordCommand.ExecuteNonQuery();
+                        updateMedicalRecordCommand.ExecuteNonQuery();
 
-                            transaction.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            transaction.Rollback();
-                            MessageBox.Show($"Error: {ex.Message}");
-                            return;
-                        }
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        MessageBox.Show($"Error: {ex.Message}");
+                        return;
                     }
                 }
-
-                LoadData_Click(sender, e);
             }
+
+            LoadData_Click(sender, e);
         }
+
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
@@ -238,7 +243,7 @@ namespace Lab_6_7
 
                             deleteMedicalRecordCommand.ExecuteNonQuery();
 
-                            // Optionally, you can delete the patient if needed
+                            // Delete the patient needed
                             var deletePatientCommand = new SqlCommand(
                                  "DELETE FROM Patients WHERE PatientID = @PatientID", connection, transaction);
                             deletePatientCommand.Parameters.AddWithValue("@PatientID", selectedRecord.PatientID);
