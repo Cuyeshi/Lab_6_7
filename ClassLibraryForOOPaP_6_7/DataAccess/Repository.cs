@@ -65,22 +65,7 @@ namespace ClassLibraryForOOPaP_6_7
                 connection.Open();
                 command.ExecuteNonQuery();
             }
-        }
-
-        public void Create(string query, Action<SqlCommand> parameterize)
-        {
-            ExecuteNonQuery(query, parameterize);
-        }
-
-        public void Update(string query, Action<SqlCommand> parameterize)
-        {
-            ExecuteNonQuery(query, parameterize);
-        }
-
-        public void Delete(string query, Action<SqlCommand> parameterize)
-        {
-            ExecuteNonQuery(query, parameterize);
-        }
+        }       
     }
 
 }

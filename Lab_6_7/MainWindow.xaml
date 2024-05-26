@@ -8,42 +8,12 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" Grid.Row="0">
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Doctor:" Width="100"/>
-                <ComboBox x:Name="DoctorsComboBox" Width="200"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Patient Name:" Width="100"/>
-                <TextBox x:Name="PatientNameTextBox" Width="200"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Birth Year:" Width="100"/>
-                <TextBox x:Name="BirthYearTextBox" Width="200"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Height:" Width="100"/>
-                <TextBox x:Name="HeightTextBox" Width="200"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Weight:" Width="100"/>
-                <TextBox x:Name="WeightTextBox" Width="200"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Blood Pressure:" Width="100"/>
-                <TextBox x:Name="BloodPressureTextBox" Width="200"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Diagnosis:" Width="100"/>
-                <ComboBox x:Name="DiagnosisComboBox" Width="200"/>
-            </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                 <Button Content="Load Data" Click="LoadData_Click" Width="100" Margin="5"/>
-                <Button Content="Create" Click="Create_Click" Width="100" Margin="5"/>
-                <Button Content="Update" Click="Update_Click" Width="100" Margin="5"/>
-                <Button Content="Delete" Click="Delete_Click" Width="100" Margin="5"/>
+                <Button Content="Edit Table" Click="EditTable_Click" Width="100" Margin="5"/>
             </StackPanel>
         </StackPanel>
-        <DataGrid x:Name="MedicalRecordsDataGrid" AutoGenerateColumns="False" Grid.Row="1" Margin="10">
+        <DataGrid x:Name="MedicalRecordsDataGrid" AutoGenerateColumns="False" Grid.Row="1" Margin="10" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Doctor" Binding="{Binding DoctorName}" Width="*"/>
                 <DataGridTextColumn Header="Patient" Binding="{Binding PatientName}" Width="*"/>
@@ -52,7 +22,7 @@
                 <DataGridTextColumn Header="Weight" Binding="{Binding Weight}" Width="*"/>
                 <DataGridTextColumn Header="Blood Pressure" Binding="{Binding BloodPressure}" Width="*"/>
                 <DataGridTextColumn Header="Diagnosis" Binding="{Binding Diagnosis}" Width="*"/>
-                <DataGridTextColumn Header="Examination Date" Binding="{Binding ExaminationDate, StringFormat={}{0:yyyy-MM-dd}}" Width="*"/>
+                <DataGridTextColumn Header="Examination Date" Binding="{Binding ExaminationDate, StringFormat=\{0:yyyy-MM-dd\}}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
